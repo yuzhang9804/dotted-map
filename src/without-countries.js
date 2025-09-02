@@ -1,5 +1,5 @@
-import proj4 from 'proj4';
 import inside from '@turf/boolean-point-in-polygon';
+import proj4 from 'proj4';
 
 function DottedMapWithoutCountries({ map, avoidOuterPins = false }) {
   const {
@@ -69,11 +69,21 @@ function DottedMapWithoutCountries({ map, avoidOuterPins = false }) {
       backgroundColor = 'transparent',
       radius = 0.5,
     }) {
-      const getPoint = ({ x, y, svgOptions = {} }) => {
+      const getColor = (id) => {
+        let renderColor = svgOptions.color || color
+        if (typeof color === 'object' && id && color[id]) {
+          renderColor = color[id]
+        }
+        return renderColor
+      }
+
+      const getPoint = ({ x, y, svgOptions = {}, id}) => {
+        const renderColor = renderColor(id)
+
         const pointRadius = svgOptions.radius || radius;
         if (shape === 'circle') {
           return `<circle cx="${x}" cy="${y}" r="${pointRadius}" fill="${
-            svgOptions.color || color
+            renderColor
           }" />`;
         } else if (shape === 'hexagon') {
           const sqrt3radius = Math.sqrt(3) * pointRadius;
@@ -89,7 +99,7 @@ function DottedMapWithoutCountries({ map, avoidOuterPins = false }) {
 
           return `<polyline points="${polyPoints
             .map((point) => point.join(','))
-            .join(' ')}" fill="${svgOptions.color || color}" />`;
+            .join(' ')}" fill="${renderColor}" />`;
         }
       };
 

@@ -1,5 +1,5 @@
-import proj4 from 'proj4';
 import inside from '@turf/boolean-point-in-polygon';
+import proj4 from 'proj4';
 import geojsonWorld from './countries.geo.json';
 import DottedMapWithoutCountries from './without-countries';
 
@@ -18,7 +18,7 @@ const geojsonToMultiPolygons = (geojson) => {
       ),
     [],
   );
-  return { type: 'Feature', geometry: { type: 'MultiPolygon', coordinates } };
+  return { type: 'Feature', geometry: { type: 'MultiPolygon', coordinates }, id: feature.id };
 };
 
 const CACHE = {};
@@ -131,7 +131,7 @@ const getMap = ({
       );
 
       if (inside(wgs84Point, poly)) {
-        points[[x, y].join(';')] = { x: localx, y: localy };
+        points[[x, y].join(';')] = { x: localx, y: localy, id: poly.id };
       }
     }
   }
