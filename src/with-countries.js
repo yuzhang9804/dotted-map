@@ -8,19 +8,6 @@ const geojsonByCountry = geojsonWorld.features.reduce((countries, feature) => {
   return countries;
 }, {});
 
-const geojsonToMultiPolygons = (geojson) => {
-  const coordinates = geojson.features.reduce(
-    (poly, feature) =>
-      poly.concat(
-        feature.geometry.type === 'Polygon'
-          ? [feature.geometry.coordinates]
-          : feature.geometry.coordinates,
-      ),
-    [],
-  );
-  return { type: 'Feature', geometry: { type: 'MultiPolygon', coordinates }, id: feature.id };
-};
-
 const CACHE = {};
 
 const DEFAULT_WORLD_REGION = {
@@ -93,8 +80,6 @@ const getMap = ({
     region = DEFAULT_WORLD_REGION;
   }
 
-  const poly = geojsonToMultiPolygons(geojson);
-
   const [X_MIN, Y_MIN] = proj4(proj4.defs('GOOGLE'), [
     region.lng.min,
     region.lat.min,
@@ -130,8 +115,12 @@ const getMap = ({
         pointGoogle,
       );
 
-      if (inside(wgs84Point, poly)) {
-        points[[x, y].join(';')] = { x: localx, y: localy, id: poly.id };
+      // 检查这个点属于哪个 feature
+      for (const feature of geojson.features) {
+        if (inside(wgs84Point, feature)) {
+          points[[x, y].join(';')] = { x: localx, y: localy, id: feature.id };
+          break; // 找到就跳出，避免重复添加
+        }
       }
     }
   }
@@ -173,7 +162,6 @@ const getCacheKey = ({
 function DottedMap({ avoidOuterPins = false, ...args }) {
   const cacheKey = getCacheKey(args);
   const map = CACHE[cacheKey] || getMap(args);
-
   return new DottedMapWithoutCountries({ avoidOuterPins, map });
 }
 

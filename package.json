@@ -9,7 +9,7 @@
   },
   "module": "./src/with-countries.js",
   "scripts": {
-    "build": "webpack",
+    "build": "rspack build",
     "test": "node test.js"
   },
   "keywords": [
@@ -28,9 +28,9 @@
     "proj4": "^2.6.1"
   },
   "devDependencies": {
-    "prettier": "^2.0.5",
-    "webpack": "^5.33.2",
-    "webpack-cli": "^4.6.0"
+    "@rspack/cli": "^1.5.2",
+    "@rspack/core": "^1.5.2",
+    "prettier": "^2.0.5"
   },
   "sideEffects": false
 }
